@@ -36,13 +36,11 @@ type KeyValue struct {
 
 func NewSection(config *ConfigFile, title string) *Section {
 	s := new(Section)
-	fmt.Println(s, "<><><><>1", title)
 	s.content = make(map[string]*KeyValue)
 	s.subSections = make(map[string]*Section)
-	s.comment = "zhangming"
+	s.comment = ""
 	s.configFile = config
 	s.Title = title
-	fmt.Println(s, "<><><><>", title)
 	return s
 }
 

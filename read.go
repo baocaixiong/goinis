@@ -34,7 +34,6 @@ func init() {
 func (c *ConfigFile) read(reader io.Reader) error {
 	buf := bufio.NewReader(reader)
 
-	// fmt.Println(NewSection(c, DEFAULT_SECTION))
 	var currentSection *Section = NewSection(c, DEFAULT_SECTION)
 	c.SetSection(currentSection)
 
@@ -128,7 +127,7 @@ func LoadFromData(data []byte) (c *ConfigFile, err error) {
 		return nil, err
 	}
 
-	return newConfigFile(tmpName)
+	return NewConfigFile(tmpName)
 }
 
 func LoadConfigFile(fileName string, moreFiles ...string) (cs *Configs, err error) {

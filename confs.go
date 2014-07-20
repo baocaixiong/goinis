@@ -1,7 +1,6 @@
 package goinis
 
 import (
-	"fmt"
 	"os"
 	"sync"
 )
@@ -13,7 +12,7 @@ type Configs struct {
 func NewConfigs(fileNames ...string) (*Configs, error) {
 	cs := new(Configs)
 	for _, fileName := range fileNames {
-		c, err := newConfigFile(fileName)
+		c, err := NewConfigFile(fileName)
 		if err != nil {
 			return nil, err
 		}
@@ -34,23 +33,19 @@ type ConfigFile struct {
 
 	sections map[string]*Section
 
-	BlockMode bool
-
 	Comment
 }
 
-func newConfigFile(fileName string) (*ConfigFile, error) {
+func NewConfigFile(fileName string) (*ConfigFile, error) {
 	c := new(ConfigFile)
 	c.fileName = fileName
 	c.Key = Util.FileName(fileName)
+	c.sections = make(map[string]*Section)
 
 	if err := c.loadFile(fileName); err != nil {
 		return nil, err
 	}
 
-	c.sections = make(map[string]*Section)
-
-	c.BlockMode = true
 	return c, nil
 }
 
@@ -71,8 +66,6 @@ func (c *ConfigFile) SetSection(s *Section) bool {
 	if c.HasSectionKey(s.Title) || s == nil {
 		return false
 	}
-
-	fmt.Println(c.sections, s, "<><>000")
 
 	c.sections[s.Title] = s
 	return true
