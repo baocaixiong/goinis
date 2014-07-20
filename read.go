@@ -64,8 +64,8 @@ func (c *ConfigFile) read(reader io.Reader) error {
 		case lineLengh == 0:
 			continue
 
-		case line[0] == ' ' && currentKeyValue != nil: // continuation line?
-			currentKeyValue.AddValue(line)
+		case line[0] == '-' && currentKeyValue != nil: // continuation line?
+			currentKeyValue.AddValue(strings.TrimPrefix(line, "-"))
 		case SECTCRE.Match([]byte(line)):
 			titles := SECTCRE.FindStringSubmatch(line)
 			title := titles[1]
