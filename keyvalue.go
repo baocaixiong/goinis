@@ -10,15 +10,15 @@ type KeyValue struct {
 	V    interface{}
 }
 
-func NewKeyValue(key string, value interface{}, comment ...string) *KeyValue {
+func NewKeyValue(key string, value interface{}) *KeyValue {
 	kv := &KeyValue{
 		K: key,
 	}
 
 	if Util.IsArrayKey(key) {
-		kv.V = append(make([]string, 0), "string")
+		kv.V = append(make([]string, 0), value.(string))
 	} else {
-		kv.V = value
+		kv.V = value.(string)
 	}
 
 	return kv
