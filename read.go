@@ -69,12 +69,37 @@ func (c *ConfigFile) read(reader io.Reader) error {
 		case SECTCRE.Match([]byte(line)):
 			titles := SECTCRE.FindStringSubmatch(line)
 			title := titles[1]
-			section, err := c.GetSection(title)
-			if err == nil {
-				currentSection = section
+			if Util.IsSubKey(title) {
+
+				keys := strings.Split(title, ".")
+				topSection, err := c.GetSection(keys[0])
+
+				if err != nil {
+					return err
+				}
+
+				if len(keys) == 2 {
+					sub := NewSection(c, keys[1])
+					currentSection.SetSubSection(sub)
+					currentSection = sub
+				} else {
+					if bottomSection, er := topSection.GetSubSection(strings.Join(keys[1:len(keys)-1], ".")); er != nil {
+						return &getError{ErrParser, title}
+					} else {
+						subs := NewSection(c, keys[len(keys)-1])
+						bottomSection.SetSubSection(subs)
+						currentSection = subs
+					}
+				}
 			} else {
-				currentSection = NewSection(c, title)
-				c.SetSection(currentSection)
+
+				section, err := c.GetSection(title)
+				if err == nil {
+					currentSection = section
+				} else {
+					currentSection = NewSection(c, title)
+					c.SetSection(currentSection)
+				}
 			}
 
 			currentKeyValue = nil

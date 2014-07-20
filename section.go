@@ -54,44 +54,47 @@ func (s *Section) SetValue(key, value string) bool {
 	} else {
 		s.content[key] = NewKeyValue(key, value)
 	}
-	return !ok
-}
-
-func (s *Section) DeleteKey(key string) bool {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	if _, ok := s.content[key]; !ok {
-		return true
-	}
-
-	// Check if key exists.
-	if _, ok := s.content[key]; ok {
-		delete(s.content, key)
-	}
 	return true
 }
 
-func (s *Section) GetSubSection(key string) *Section {
+func (s *Section) DeleteKey(key string) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	if _, ok := s.content[key]; ok {
+		delete(s.content, key)
+	}
+}
+
+func (s *Section) GetSubSection(key string) (*Section, error) {
 	if !Util.IsSubKey(key) {
-		return s.subSections[key]
+		return s.subSections[key], nil
 	}
 
 	keys := strings.SplitN(key, ".", 2)
 
-	if j, has := s.subSections[keys[0]]; !has {
+	if j, has := s.subSections[keys[0]]; has {
 		return j.GetSubSection(keys[1])
 	} else {
-		return nil
+		return nil, &getError{ErrSectionNotFound, key}
 	}
+}
+
+func (s *Section) SetSubSection(subs *Section) *Section {
+	s.subSections[subs.Title] = subs
+	return s
 }
 
 func (s *Section) GetValue(key string) (interface{}, error) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
+	var err error
 	if Util.IsSubKey(key) {
-		s = s.GetSubSection(key)
+		s, err = s.GetSubSection(key)
+		if err != nil {
+			return nil, &getError{ErrKeyNotFound, key}
+		}
 	} else {
 		value, ok := s.content[key]
 		if ok {
