@@ -1,6 +1,7 @@
 package goinis
 
 import (
+	"fmt"
 	"os"
 	"sync"
 )
@@ -35,7 +36,7 @@ type ConfigFile struct {
 
 	BlockMode bool
 
-	*Comment
+	Comment
 }
 
 func newConfigFile(fileName string) (*ConfigFile, error) {
@@ -67,9 +68,11 @@ func (c *ConfigFile) SetSection(s *Section) bool {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	if c.HasSectionKey(s.Title) {
+	if c.HasSectionKey(s.Title) || s == nil {
 		return false
 	}
+
+	fmt.Println(c.sections, s, "<><>000")
 
 	c.sections[s.Title] = s
 	return true

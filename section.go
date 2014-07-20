@@ -23,7 +23,7 @@ type Section struct {
 	subSections map[string]*Section
 
 	configFile *ConfigFile
-	*Comment
+	Comment
 }
 
 type KeyValue struct {
@@ -31,22 +31,25 @@ type KeyValue struct {
 	K    string
 	V    interface{}
 
-	*Comment
+	Comment
 }
 
 func NewSection(config *ConfigFile, title string) *Section {
 	s := new(Section)
+	fmt.Println(s, "<><><><>1", title)
 	s.content = make(map[string]*KeyValue)
 	s.subSections = make(map[string]*Section)
-	s.comment = ""
+	s.comment = "zhangming"
 	s.configFile = config
+	s.Title = title
+	fmt.Println(s, "<><><><>", title)
 	return s
 }
 
 func NewKeyValue(key string, value interface{}, comment ...string) *KeyValue {
 	kv := &KeyValue{
 		K:       key,
-		Comment: &Comment{comment: ""},
+		Comment: Comment{comment: ""},
 	}
 	if len(comment) > 0 {
 		kv.comment = comment[0]
@@ -86,14 +89,12 @@ func (kv *KeyValue) AddValue(str string) *KeyValue {
 	kv.lock.Lock()
 	defer kv.lock.Unlock()
 
-	if !Util.IsArrayKey(kv.K) {
-		switch v := kv.V.(type) {
-		case string:
-			kv.V = v + str
-		case []string:
-			last := v[len(v)-1]
-			kv.V = append(v[:len(v)-1], last+str)
-		}
+	switch v := kv.V.(type) {
+	case string:
+		kv.V = v + str
+	case []string:
+		last := v[len(v)-1]
+		kv.V = append(v[:len(v)-1], last+str)
 	}
 
 	return kv

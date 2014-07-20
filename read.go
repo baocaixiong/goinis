@@ -34,6 +34,7 @@ func init() {
 func (c *ConfigFile) read(reader io.Reader) error {
 	buf := bufio.NewReader(reader)
 
+	// fmt.Println(NewSection(c, DEFAULT_SECTION))
 	var currentSection *Section = NewSection(c, DEFAULT_SECTION)
 	c.SetSection(currentSection)
 
@@ -48,7 +49,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 	for {
 		line, err := buf.ReadString('\n')
 		line = strings.TrimSpace(line)
-		lineLengh := len(line) //[SWH|+]
+		lineLengh := len(line)
 		if err != nil {
 			if err != io.EOF {
 				return err
@@ -74,8 +75,8 @@ func (c *ConfigFile) read(reader io.Reader) error {
 		case line[0] == ' ' && currentKeyValue != nil: // continuation line?
 			currentKeyValue.AddValue(line)
 		case SECTCRE.Match([]byte(line)):
-			SECTCRE.FindAllStringSubmatch(line, -1)
-			title := SECTCRE.SubexpNames()[1]
+			titles := SECTCRE.FindStringSubmatch(line)
+			title := titles[1]
 			section, err := c.GetSection(title)
 			if err != nil {
 				currentSection = section
@@ -139,7 +140,7 @@ func LoadConfigFile(fileName string, moreFiles ...string) (cs *Configs, err erro
 
 	cs, err = NewConfigs(fileNames...)
 
-	return cs, nil
+	return cs, err
 }
 
 type readError struct {
