@@ -32,8 +32,6 @@ type ConfigFile struct {
 	Key      string
 
 	sections map[string]*Section
-
-	Comment
 }
 
 func NewConfigFile(fileName string) (*ConfigFile, error) {
@@ -116,20 +114,4 @@ func (c *ConfigFile) GetSectionList() []*Section {
 		list = append(list, s)
 	}
 	return list
-}
-
-type Comment struct {
-	comment string
-}
-
-func (c *Comment) AddComment(str string) *Comment {
-	c.comment = c.comment + str
-
-	return c
-}
-
-func (c *Comment) SetCommnet(str string) *Comment {
-	c.comment = str
-
-	return c
 }

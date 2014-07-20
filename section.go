@@ -23,79 +23,15 @@ type Section struct {
 	subSections map[string]*Section
 
 	configFile *ConfigFile
-	Comment
-}
-
-type KeyValue struct {
-	lock sync.RWMutex
-	K    string
-	V    interface{}
-
-	Comment
 }
 
 func NewSection(config *ConfigFile, title string) *Section {
 	s := new(Section)
 	s.content = make(map[string]*KeyValue)
 	s.subSections = make(map[string]*Section)
-	s.comment = ""
 	s.configFile = config
 	s.Title = title
 	return s
-}
-
-func NewKeyValue(key string, value interface{}, comment ...string) *KeyValue {
-	kv := &KeyValue{
-		K:       key,
-		Comment: Comment{comment: ""},
-	}
-	if len(comment) > 0 {
-		kv.comment = comment[0]
-	}
-
-	if Util.IsArrayKey(key) {
-		kv.V = append(make([]string, 0), "string")
-	} else {
-		kv.V = value
-	}
-
-	return kv
-}
-
-func (kv *KeyValue) SetValue(value string, comment ...string) *KeyValue {
-	kv.lock.Lock()
-	defer kv.lock.Unlock()
-	switch v := kv.V.(type) {
-	case []string:
-		kv.V = append(v, value)
-	case string:
-		kv.V = value
-	}
-
-	if len(comment) > 0 {
-		kv.comment = comment[0]
-	}
-
-	return kv
-}
-
-func (kv *KeyValue) GetValue() interface{} {
-	return kv.V
-}
-
-func (kv *KeyValue) AddValue(str string) *KeyValue {
-	kv.lock.Lock()
-	defer kv.lock.Unlock()
-
-	switch v := kv.V.(type) {
-	case string:
-		kv.V = v + str
-	case []string:
-		last := v[len(v)-1]
-		kv.V = append(v[:len(v)-1], last+str)
-	}
-
-	return kv
 }
 
 func (s *Section) SetKeyValue(kv *KeyValue) *Section {
@@ -106,17 +42,17 @@ func (s *Section) SetKeyValue(kv *KeyValue) *Section {
 	return s
 }
 
-func (s *Section) SetValue(key, value string, comment ...string) bool {
+func (s *Section) SetValue(key, value string) bool {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	// Check if key exists.
 	kv, ok := s.content[key]
 	if ok { // 已经包含了。
-		kv.SetValue(value, comment...)
+		kv.SetValue(value)
 		// @ZHANGMING 向KeyValue中添加值
 	} else {
-		s.content[key] = NewKeyValue(key, value, comment...)
+		s.content[key] = NewKeyValue(key, value)
 	}
 	return !ok
 }
@@ -298,29 +234,6 @@ func (s *Section) GetKeyList() []string {
 		list = append(list, key)
 	}
 	return list
-}
-
-func (s *Section) SetKeyComments(key, comment string) bool {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	// Check if section exists.
-	if kv, ok := s.content[key]; ok {
-		kv.comment = comment
-	}
-	return true
-}
-
-func (s *Section) GetComments() string {
-	return s.comment
-}
-
-func (s *Section) GetKeyComments(key string) string {
-	if kv, ok := s.content[key]; ok {
-		return kv.comment
-	}
-
-	return ""
 }
 
 func (s *Section) GetKeyValue(key string) (*KeyValue, bool) {

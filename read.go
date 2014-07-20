@@ -42,7 +42,6 @@ func (c *ConfigFile) read(reader io.Reader) error {
 	// inKeyValue := false
 	//var lastLineObj interface{}
 
-	var comments string
 	var lineno = 0
 
 	for {
@@ -64,13 +63,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 		switch {
 		case lineLengh == 0:
 			continue
-		case line[0] == '#' || line[0] == ';':
-			if len(comments) == 0 {
-				comments = line
-			} else {
-				comments += LineBreak + line
-			}
-			continue
+
 		case line[0] == ' ' && currentKeyValue != nil: // continuation line?
 			currentKeyValue.AddValue(line)
 		case SECTCRE.Match([]byte(line)):
@@ -85,10 +78,6 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			}
 
 			currentKeyValue = nil
-			if len(comments) > 0 {
-				currentSection.SetCommnet(comments)
-				comments = ""
-			}
 
 			continue
 		case OPTCRE.Match([]byte(line)):
@@ -100,11 +89,9 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			keyValue, has := currentSection.GetKeyValue(key)
 			if !has {
 				keyValue = NewKeyValue(key, value)
-				keyValue.SetCommnet(value)
 				currentSection.SetKeyValue(keyValue)
 			} else {
 				keyValue.SetValue(value)
-				currentKeyValue.AddComment(comments)
 			}
 
 			currentKeyValue = keyValue
