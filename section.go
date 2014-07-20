@@ -97,7 +97,7 @@ func (s *Section) GetValue(key string) (interface{}, error) {
 		if ok {
 			return value.GetValue(), nil
 		} else {
-			return nil, getError{ErrKeyNotFound, key}
+			return nil, &getError{ErrKeyNotFound, key}
 		}
 	}
 
@@ -114,7 +114,7 @@ func (s *Section) Bool(key string) (bool, error) {
 	case string:
 		return strconv.ParseBool(v)
 	default:
-		return false, getError{ErrCouldNotParse, key}
+		return false, &getError{ErrCouldNotParse, key}
 	}
 }
 
@@ -127,7 +127,7 @@ func (s *Section) Float64(key string) (float64, error) {
 	case string:
 		return strconv.ParseFloat(v, 64)
 	default:
-		return 0.0, getError{ErrCouldNotParse, key}
+		return 0.0, &getError{ErrCouldNotParse, key}
 	}
 }
 
@@ -140,7 +140,7 @@ func (s *Section) Int(key string) (int, error) {
 	case string:
 		return strconv.Atoi(v)
 	default:
-		return 0, getError{ErrCouldNotParse, key}
+		return 0, &getError{ErrCouldNotParse, key}
 	}
 }
 
@@ -154,7 +154,7 @@ func (s *Section) Int64(key string) (int64, error) {
 	case string:
 		return strconv.ParseInt(v, 10, 64)
 	default:
-		return 0, getError{ErrCouldNotParse, key}
+		return 0, &getError{ErrCouldNotParse, key}
 	}
 }
 
@@ -246,12 +246,15 @@ type getError struct {
 	Name   string
 }
 
-func (err getError) Error() string {
+func (err *getError) Error() string {
 	switch err.Reason {
 	case ErrSectionNotFound:
 		return fmt.Sprintf("section '%s' not found", err.Name)
 	case ErrKeyNotFound:
 		return fmt.Sprintf("key '%s' not found", err.Name)
+	case ErrParser:
+		return fmt.Sprintf("parse configure file error.")
 	}
+	Util.Println(err.Reason, err.Name)
 	return "invalid get error"
 }

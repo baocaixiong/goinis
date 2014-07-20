@@ -1,6 +1,7 @@
 package goinis
 
 import (
+	"fmt"
 	"path"
 	"strings"
 )
@@ -19,4 +20,8 @@ func (u *_util) IsSubKey(k string) bool {
 
 func (u *_util) FileName(fileName string) string {
 	return strings.TrimSuffix(path.Base(fileName), path.Ext(fileName))
+}
+
+func (u *_util) Println(f ...interface{}) {
+	fmt.Println(f...)
 }

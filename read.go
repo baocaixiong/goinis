@@ -70,7 +70,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			titles := SECTCRE.FindStringSubmatch(line)
 			title := titles[1]
 			section, err := c.GetSection(title)
-			if err != nil {
+			if err == nil {
 				currentSection = section
 			} else {
 				currentSection = NewSection(c, title)
@@ -81,8 +81,8 @@ func (c *ConfigFile) read(reader io.Reader) error {
 
 			continue
 		case OPTCRE.Match([]byte(line)):
-			matches := OPTCRE.SubexpNames()[1:]
-			key, _, value := matches[0], matches[1], matches[2]
+			matches := OPTCRE.FindStringSubmatch(line)[1:]
+			key, value := matches[0], matches[2]
 			if currentSection == nil {
 				return &getError{ErrParser, "parser error"}
 			}

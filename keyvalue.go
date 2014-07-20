@@ -1,5 +1,9 @@
 package goinis
 
+import (
+	"sync"
+)
+
 type KeyValue struct {
 	lock sync.RWMutex
 	K    string

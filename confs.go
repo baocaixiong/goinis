@@ -48,13 +48,11 @@ func NewConfigFile(fileName string) (*ConfigFile, error) {
 }
 
 func (c *ConfigFile) GetSection(key string) (*Section, error) {
-	var s *Section
-	var has bool
-	if s, has = c.sections[key]; has {
-		return nil, getError{ErrSectionNotFound, key}
+	if s, has := c.sections[key]; has {
+		return s, nil
 	}
 
-	return s, nil
+	return nil, &getError{ErrSectionNotFound, key}
 }
 
 func (c *ConfigFile) SetSection(s *Section) bool {
