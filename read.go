@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"runtime"
+	// "runtime"
 	"strings"
 	"time"
 )
@@ -19,17 +19,10 @@ const (
 	DEFAULT_SECTION = "DEFAULT"
 )
 
-var LineBreak = "\n"
-
+//from python ConfigParser module
 var SECTCRE, _ = regexp.Compile(`\[(?P<header>[^]]+)\]`)
 
 var OPTCRE, _ = regexp.Compile(`(?P<option>[^:=\s][^:=]*)\s*(?P<vi>[:=])\s*(?P<value>.*)$`)
-
-func init() {
-	if runtime.GOOS == "windows" {
-		LineBreak = "\r\n"
-	}
-}
 
 func (c *ConfigFile) read(reader io.Reader) error {
 	buf := bufio.NewReader(reader)
@@ -38,11 +31,6 @@ func (c *ConfigFile) read(reader io.Reader) error {
 	c.SetSection(currentSection)
 
 	var currentKeyValue *KeyValue = nil
-
-	// inKeyValue := false
-	//var lastLineObj interface{}
-
-	var lineno = 0
 
 	for {
 		line, err := buf.ReadString('\n')
@@ -57,8 +45,6 @@ func (c *ConfigFile) read(reader io.Reader) error {
 				break
 			}
 		}
-
-		lineno += 1
 
 		switch {
 		case lineLengh == 0:
@@ -109,7 +95,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			matches := OPTCRE.FindStringSubmatch(line)[1:]
 			key, value := matches[0], matches[2]
 			if currentSection == nil {
-				return &getError{ErrParser, "parser error"}
+				return &getError{ErrParser, line}
 			}
 			keyValue, has := currentSection.GetKeyValue(key)
 			if !has {
