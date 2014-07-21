@@ -45,12 +45,44 @@ func TestLoadConfigFile(t *testing.T) {
 			_, er := mockSection.Bool("boolean_1")
 			So(er, ShouldNotBeNil)
 			So(boolean, ShouldEqual, mockBoolean)
+
+			notExist1 := s.MustInt64("haha", 9)
+			So(notExist1, ShouldEqual, 9)
+
+			notExist2 := s.MustBool("haha", true)
+			So(notExist2, ShouldBeTrue)
+
+			notExist3 := s.MustFloat64("haha", 16.0)
+			So(notExist3, ShouldEqual, 16.0)
+
+			notExist4 := s.MustStringValue("haha", "九妹九妹漂亮的妹妹")
+			So(notExist4, ShouldEqual, "九妹九妹漂亮的妹妹")
+
+			notExist5 := s.MustStringValueRange("relation", "haha", []string{"haha1"})
+			So(notExist5, ShouldEqual, "haha")
+
+			notExist6 := s.MustStringValueRange("relation", "father", []string{"haha1"})
+			So(notExist6, ShouldEqual, "father")
 		})
 
 		Convey("test get a section is not exist.", func() {
 			s, err := c.GetSection("parent_1")
 			So(s, ShouldBeNil)
 			So(err, ShouldResemble, &getError{ErrSectionNotFound, "parent_1"})
+		})
+
+		Convey("test get subsection", func() {
+			s, _ := c.GetSection("hasChildren")
+			So(s, ShouldNotBeNil)
+			sub1, err := s.GetSubSection("child1")
+			So(err, ShouldBeNil)
+			So(sub1, ShouldNotBeNil)
+			mockSub1 := NewSection(c, "child1")
+			mockSub1.SetKeyValue(NewKeyValue("name", "child1"))
+			So(sub1, ShouldResemble, mockSub1)
+			name, _ := sub1.GetValue("name")
+			mockName, _ := mockSub1.GetValue("name")
+			So(name, ShouldEqual, mockName)
 		})
 	})
 }

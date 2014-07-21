@@ -108,7 +108,7 @@ func (s *Section) GetValue(key string) (interface{}, error) {
 	return s.GetValue(key)
 }
 
-func (s *Section) Bool(key string) (bool, error) {
+func (s *Section) Bool(key string) (bool, error) { // default is false
 	value, err := s.GetValue(key)
 	if err != nil {
 		return false, err
@@ -134,7 +134,7 @@ func (s *Section) Float64(key string) (float64, error) {
 	}
 }
 
-func (s *Section) Int(key string) (int, error) {
+func (s *Section) Int(key string) (int, error) { // default is 0
 	value, err := s.GetValue(key)
 	if err != nil {
 		return 0, err
