@@ -78,11 +78,16 @@ func TestLoadConfigFile(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(sub1, ShouldNotBeNil)
 			mockSub1 := NewSection(c, "child1")
-			mockSub1.SetKeyValue(newKeyValue("name", "child1"))
+			mockSub1.SetKeyValue(newKeyValue("name", "child1name"))
 			So(sub1, ShouldResemble, mockSub1)
 			name, _ := sub1.GetValue("name")
 			mockName, _ := mockSub1.GetValue("name")
 			So(name, ShouldEqual, mockName)
+
+			subValue, err := s.GetValue("child1.name")
+			So(err, ShouldBeNil)
+			So("child1name", ShouldEqual, subValue)
+
 		})
 	})
 }

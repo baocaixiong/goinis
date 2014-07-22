@@ -88,10 +88,11 @@ func (s *Section) SetSubSection(subs *Section) *Section {
 func (s *Section) GetValue(key string) (interface{}, error) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
+	sepLastIndex := strings.LastIndex(key, ".")
 
 	var err error
 	if Util.IsSubKey(key) {
-		s, err = s.GetSubSection(key)
+		s, err = s.GetSubSection(key[:sepLastIndex])
 		if err != nil {
 			return nil, &getError{ErrKeyNotFound, key}
 		}
@@ -104,8 +105,7 @@ func (s *Section) GetValue(key string) (interface{}, error) {
 		}
 	}
 
-	key = key[strings.LastIndex(key, "."):]
-	return s.GetValue(key)
+	return s.GetValue(key[sepLastIndex+1:])
 }
 
 func (s *Section) Bool(key string) (bool, error) { // default is false
