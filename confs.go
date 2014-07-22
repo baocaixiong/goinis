@@ -113,3 +113,13 @@ func (c *ConfigFile) GetSectionList() []*Section {
 	}
 	return list
 }
+
+func (c *ConfigFile) GetValue(key string) (interface{}, error) {
+	defalutSection := c.GetDefaultSection()
+	return defalutSection.GetValue(key)
+}
+
+func (c *ConfigFile) GetDefaultSection() *Section {
+	defaultSection, _ := c.GetSection(DEFAULT_SECTION)
+	return defaultSection
+}

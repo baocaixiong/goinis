@@ -125,8 +125,7 @@ func (s *Section) GetValue(key string) (interface{}, error) {
 			return nil, &getError{ErrKeyNotFound, key}
 		}
 	} else {
-		value, ok := s.content[key]
-		if ok {
+		if value, ok := s.content[key]; ok {
 			return value.getValue(), nil
 		} else {
 			return nil, &getError{ErrKeyNotFound, key}
@@ -265,6 +264,18 @@ func (s *Section) GetKeyList() []string {
 		list = append(list, key)
 	}
 	return list
+}
+
+func (s *Section) GetSlice(key string) ([]string, error) {
+	if !Util.IsArrayKey(key) {
+		return nil, &getError{ErrKeyNotFound, key}
+	}
+
+	if v, err := s.GetValue(key); err != nil {
+		return nil, err
+	} else {
+		return v.([]string), nil
+	}
 }
 
 func (s *Section) GetKeyValue(key string) (*keyValue, bool) {

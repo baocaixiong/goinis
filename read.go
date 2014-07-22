@@ -93,7 +93,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			continue
 		case OPTCRE.Match([]byte(line)):
 			matches := OPTCRE.FindStringSubmatch(line)[1:]
-			key, value := matches[0], matches[2]
+			key, value := strings.TrimSpace(matches[0]), strings.TrimSpace(matches[2])
 			if currentSection == nil {
 				return &getError{ErrParser, line}
 			}

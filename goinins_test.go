@@ -88,5 +88,20 @@ func TestLoadConfigFile(t *testing.T) {
 			So(err, ShouldBeNil)
 			So("child1name", ShouldEqual, subValue)
 		})
+
+		Convey("test get configure key value ", func() {
+			value1, err := c.GetValue("configName")
+			s, _ := c.GetSection(DEFAULT_SECTION)
+			value2, _ := s.GetValue("configName")
+			So(value1, ShouldEqual, value2)
+			So(err, ShouldBeNil)
+			v := value1.(string)
+			So(v, ShouldEqual, "这里是文件名称")
+
+			number, _ := c.GetDefaultSection().Int("number")
+			So(number, ShouldEqual, 1)
+			array, _ := c.GetDefaultSection().GetSlice("slice[]")
+			So(array, ShouldResemble, []string{"9", "10"})
+		})
 	})
 }
