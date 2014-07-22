@@ -57,13 +57,41 @@ func (s *Section) SetValue(key, value string) bool {
 	return true
 }
 
-func (s *Section) DeleteKey(key string) {
+func (s *Section) DeleteKey(key string) (bool, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
+	sepLastIndex := strings.LastIndex(key, ".")
+	var err error
+	if Util.IsSubKey(key) {
+		s, err = s.GetSubSection(key[:sepLastIndex])
+		if err != nil {
+			return false, &getError{ErrKeyNotFound, key}
+		}
+	}
+
 	if _, ok := s.content[key]; ok {
 		delete(s.content, key)
+		return true, nil
+	} else {
+		return false, &getError{ErrKeyNotFound, key}
 	}
+}
+
+func (s *Section) HasKey(key string) bool {
+	sepLastIndex := strings.LastIndex(key, ".")
+	var err error
+	if Util.IsSubKey(key) {
+		s, err = s.GetSubSection(key[:sepLastIndex])
+		if err != nil {
+			return false
+		}
+	}
+	if _, ok := s.content[key[sepLastIndex+1:]]; ok {
+		return true
+	}
+
+	return false
 }
 
 func (s *Section) GetSubSection(key string) (*Section, error) {

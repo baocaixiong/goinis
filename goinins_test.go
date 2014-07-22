@@ -87,7 +87,6 @@ func TestLoadConfigFile(t *testing.T) {
 			subValue, err := s.GetValue("child1.name")
 			So(err, ShouldBeNil)
 			So("child1name", ShouldEqual, subValue)
-
 		})
 	})
 }
