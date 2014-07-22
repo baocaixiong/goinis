@@ -30,7 +30,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 	var currentSection *Section = NewSection(c, DEFAULT_SECTION)
 	c.SetSection(currentSection)
 
-	var currentKeyValue *KeyValue = nil
+	var currentKeyValue *keyValue = nil
 
 	for {
 		line, err := buf.ReadString('\n')
@@ -51,7 +51,7 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			continue
 
 		case line[0] == '-' && currentKeyValue != nil: // continuation line?
-			currentKeyValue.AddValue(strings.TrimPrefix(line, "-"))
+			currentKeyValue.addValue(strings.TrimPrefix(line, "-"))
 		case SECTCRE.Match([]byte(line)):
 			titles := SECTCRE.FindStringSubmatch(line)
 			title := titles[1]
@@ -99,10 +99,10 @@ func (c *ConfigFile) read(reader io.Reader) error {
 			}
 			keyValue, has := currentSection.GetKeyValue(key)
 			if !has {
-				keyValue = NewKeyValue(key, value)
+				keyValue = newKeyValue(key, value)
 				currentSection.SetKeyValue(keyValue)
 			} else {
-				keyValue.SetValue(value)
+				keyValue.setValue(value)
 			}
 
 			currentKeyValue = keyValue

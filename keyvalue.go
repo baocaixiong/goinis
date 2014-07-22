@@ -4,14 +4,14 @@ import (
 	"sync"
 )
 
-type KeyValue struct {
+type keyValue struct {
 	lock sync.RWMutex
 	K    string
 	V    interface{}
 }
 
-func NewKeyValue(key string, value interface{}) *KeyValue {
-	kv := &KeyValue{
+func newKeyValue(key string, value interface{}) *keyValue {
+	kv := &keyValue{
 		K: key,
 	}
 
@@ -24,7 +24,7 @@ func NewKeyValue(key string, value interface{}) *KeyValue {
 	return kv
 }
 
-func (kv *KeyValue) SetValue(value string) *KeyValue {
+func (kv *keyValue) setValue(value string) *keyValue {
 	kv.lock.Lock()
 	defer kv.lock.Unlock()
 	switch v := kv.V.(type) {
@@ -37,11 +37,11 @@ func (kv *KeyValue) SetValue(value string) *KeyValue {
 	return kv
 }
 
-func (kv *KeyValue) GetValue() interface{} {
+func (kv *keyValue) getValue() interface{} {
 	return kv.V
 }
 
-func (kv *KeyValue) AddValue(str string) *KeyValue {
+func (kv *keyValue) addValue(str string) *keyValue {
 	kv.lock.Lock()
 	defer kv.lock.Unlock()
 

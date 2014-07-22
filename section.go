@@ -18,7 +18,7 @@ const (
 type Section struct {
 	lock    sync.RWMutex // Go map is not safe.
 	Title   string
-	content map[string]*KeyValue
+	content map[string]*keyValue
 
 	subSections map[string]*Section
 
@@ -27,14 +27,14 @@ type Section struct {
 
 func NewSection(config *ConfigFile, title string) *Section {
 	s := new(Section)
-	s.content = make(map[string]*KeyValue)
+	s.content = make(map[string]*keyValue)
 	s.subSections = make(map[string]*Section)
 	s.configFile = config
 	s.Title = title
 	return s
 }
 
-func (s *Section) SetKeyValue(kv *KeyValue) *Section {
+func (s *Section) SetKeyValue(kv *keyValue) *Section {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.content[kv.K] = kv
@@ -49,10 +49,10 @@ func (s *Section) SetValue(key, value string) bool {
 	// Check if key exists.
 	kv, ok := s.content[key]
 	if ok { // 已经包含了。
-		kv.SetValue(value)
+		kv.setValue(value)
 		// @ZHANGMING 向KeyValue中添加值
 	} else {
-		s.content[key] = NewKeyValue(key, value)
+		s.content[key] = newKeyValue(key, value)
 	}
 	return true
 }
@@ -98,7 +98,7 @@ func (s *Section) GetValue(key string) (interface{}, error) {
 	} else {
 		value, ok := s.content[key]
 		if ok {
-			return value.GetValue(), nil
+			return value.getValue(), nil
 		} else {
 			return nil, &getError{ErrKeyNotFound, key}
 		}
@@ -239,7 +239,7 @@ func (s *Section) GetKeyList() []string {
 	return list
 }
 
-func (s *Section) GetKeyValue(key string) (*KeyValue, bool) {
+func (s *Section) GetKeyValue(key string) (*keyValue, bool) {
 	kv, has := s.content[key]
 	return kv, has
 }
